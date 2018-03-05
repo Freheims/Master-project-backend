@@ -20,6 +20,8 @@ func main() {
 	router.GET("/debug/drop", func(c *gin.Context) {
 		db.DropTableIfExists(&Session{})
 		db.DropTableIfExists(&Datapoint{})
+		db.AutoMigrate(&Session{})
+		db.AutoMigrate(&Datapoint{})
 	})
 
 	router.Run(":8000")
