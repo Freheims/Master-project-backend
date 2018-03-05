@@ -11,7 +11,7 @@ type Session struct {
 	User		string
 	StartTime	int
 	EndTime		int
-	Datapoints	[]Datapoint
+	Datapoints	[]Datapoint `gorm:"foreignkey:SessionRefer"`
 }
 
 type Datapoint struct {
