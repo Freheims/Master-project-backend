@@ -22,9 +22,9 @@ type Datapoint struct {
 	Timestamp	int
 	RSSI		int
 	Steps		int
-	RotationX	float
-	RotationY	float
-	RotationZ	float
+	RotationX	float64
+	RotationY	float64
+	RotationZ	float64
 }
 
 type Beacon struct {
