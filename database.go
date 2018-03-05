@@ -11,11 +11,12 @@ type Session struct {
 	User		string
 	StartTime	int
 	EndTime		int
-	Datapoints	[]Datapoint `gorm:"foreignkey:SessionRefer"`
+	Datapoints	[]Datapoint `gorm:"foreignkey:SessionId"`
 }
 
 type Datapoint struct {
 	gorm.Model
+	SessionId	int
 	UUID		string
 	Major		int
 	Minor		int
