@@ -21,6 +21,10 @@ type Datapoint struct {
 	Minor		int
 	Timestamp	int
 	RSSI		int
+	Steps		int
+	RotationX	float
+	RotationY	float
+	RotationZ	float
 }
 
 type Beacon struct {
