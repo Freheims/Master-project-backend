@@ -13,6 +13,7 @@ func main() {
 		var session Session
 		c.Bind(&session)
 		db.Create(&session)
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
 	})
@@ -20,6 +21,7 @@ func main() {
 	router.GET("/raw/sessions", func(c *gin.Context) {
 		var sessions []Session
 		db.Preload("Datapoints").Find(&sessions)
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &sessions)
 		return
 
@@ -29,6 +31,7 @@ func main() {
 		var session Session
 		sessionid := c.PostForm("id")
 		db.Preload("Datapoints").Find(&session, sessionid)
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &session)
 		return
 
