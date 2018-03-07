@@ -29,7 +29,7 @@ func main() {
 
 	router.GET("/raw/session/:id", func(c *gin.Context) {
 		var session Session
-		sessionid := c.PostForm("id")
+		sessionid := c.Param("id")
 		db.Preload("Datapoints").Find(&session, sessionid)
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &session)
