@@ -17,6 +17,23 @@ func main() {
 		return
 	})
 
+	router.GET("/raw/sessions", func(c *gin.Context) {
+		var sessions []Session
+		db.Preload("Datapoints").Find(&sessions)
+		c.IndentedJSON(200, &sessions)
+		return
+
+	})
+
+	router.GET("/raw/session/:id", func(c *gin.Context) {
+		var session Session
+		sessionid := c.PostForm("id")
+		db.Preload("Datapoints").Find(&session, sessionid)
+		c.IndentedJSON(200, &session)
+		return
+
+	})
+
 	router.GET("/debug/drop", func(c *gin.Context) {
 		db.DropTableIfExists(&Session{})
 		db.DropTableIfExists(&Datapoint{})
