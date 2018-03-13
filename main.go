@@ -61,6 +61,32 @@ func main() {
 
 	})
 
+	router.POST("/beacon", func(c *gin.Context) {
+		var beacon Beacon
+		c.Bind(&beacon)
+		db.Create(&beacon)
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Status(200)
+		return
+	})
+
+	router.GET("/beacons", func(c *gin.Context) {
+		var beacons []Beacon
+		db.Find(&beacons)
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.IndentedJSON(200, &beacons)
+		return
+	})
+
+	router.POST("/sessionbeacon", func(c *gin.Context) {
+		var sessionbeacon SessionBeacon
+		c.Bind(&sessionbeacon)
+		db.Create(&sessionbeacon)
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Status(200)
+		return
+	})
+
 	router.GET("/debug/drop", func(c *gin.Context) {
 		db.DropTableIfExists(&Session{})
 		db.DropTableIfExists(&Datapoint{})
