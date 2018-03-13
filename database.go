@@ -63,4 +63,6 @@ func init() {
 
 	db.AutoMigrate(&Session{})
 	db.AutoMigrate(&Datapoint{})
+	db.AutoMigrate(&Beacon{})
+	db.AutoMigrate(&SessionBeacon{})
 }
