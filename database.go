@@ -33,7 +33,6 @@ type Datapoint struct {
 
 type Beacon struct {
 	gorm.Model
-	SessionId	int
 	UUID		string
 	Major		string
 	Minor		string
