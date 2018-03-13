@@ -12,6 +12,9 @@ type Session struct {
 	StartTime	int
 	EndTime		int
 	Datapoints	[]Datapoint `gorm:"foreignkey:SessionId"`
+	Beacons		[]SessionBeacon `gorm:"foreignkey:SessionId"`
+	Finished	bool `gorm:"default:false"`
+	Map			string
 }
 
 type Datapoint struct {
@@ -30,10 +33,22 @@ type Datapoint struct {
 
 type Beacon struct {
 	gorm.Model
-	UUID  string
-	Major string
-	Minor string
-	Name  string
+	SessionId	int
+	UUID		string
+	Major		string
+	Minor		string
+	Name		string
+}
+
+type SessionBeacon struct {
+	gorm.Model
+	SessionId	int
+	UUID		string
+	Major		string
+	Minor		string
+	Name		string
+	XCoordinate	float64
+	YCoordinate float64
 }
 
 var db *gorm.DB

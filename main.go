@@ -37,6 +37,30 @@ func main() {
 
 	})
 
+	router.POST("/raw/sessions", func(c *gin.Context) {
+		finished := c.PostForm("Finished")
+		var sessions []Session
+		db.Preload("Datapoints").Where("finished = ?", finished).Find(&sessions)
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.IndentedJSON(200, &sessions)
+		return
+
+	})
+
+	router.PUT("/raw/session/:id", func(c *gin.Context) {
+		var session Session
+		sessionid := c.Param("id")
+		db.Find(&session, sessionid)
+		var newSession Session
+		c.Bind(&newSession)
+		db.Model(&session).Updates(&newSession)
+		db.Save(&session)
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Status(200)
+		return
+
+	})
+
 	router.GET("/debug/drop", func(c *gin.Context) {
 		db.DropTableIfExists(&Session{})
 		db.DropTableIfExists(&Datapoint{})
