@@ -104,3 +104,5 @@ ENV/
 *.db
 Master-project-backend
 *.swp
+
+maps/

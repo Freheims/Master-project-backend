@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -13,6 +14,17 @@ func main() {
 		var session Session
 		c.Bind(&session)
 		db.Create(&session)
+		file, err := c.FormFile("Map")
+		if err != nil {
+			c.String(400, fmt.Sprintf("get form err: %s", err.Error()))
+			return
+		}
+
+		filename := session.ID
+		if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint(filename)+".png"); err != nil {
+			c.String(400, fmt.Sprintf("upload file err: %s", err.Error()))
+			return
+		}
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
