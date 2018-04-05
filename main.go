@@ -25,6 +25,8 @@ func main() {
 			c.String(400, fmt.Sprintf("upload file err: %s", err.Error()))
 			return
 		}
+		session.Map = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprint(filename)+".png"
+		db.Save(&session)
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
@@ -109,6 +111,8 @@ func main() {
 		db.AutoMigrate(&Beacon{})
 		db.AutoMigrate(&SessionBeacon{})
 	})
+
+	router.Static("/maps", "./maps")
 
 	router.Run(":8000")
 }
