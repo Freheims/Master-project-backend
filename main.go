@@ -98,12 +98,12 @@ func main() {
 
 		files,_ := ioutil.ReadDir("./maps/")
 		filecount := len(files)
-		if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint("%d", filecount)+".png"); err != nil {
+		if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint(filecount)+".png"); err != nil {
 			c.String(400, fmt.Sprintf("upload file err: %s", err.Error()))
 			return
 		}
 		var url URL
-		url.Url = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprintf("%d", filecount)+".png"
+		url.Url = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprint(filecount)+".png"
 
 		c.IndentedJSON(200, url)
 		return
