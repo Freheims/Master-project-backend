@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -14,17 +15,6 @@ func main() {
 		var session Session
 		c.Bind(&session)
 		db.Create(&session)
-		file, err := c.FormFile("Map")
-		if err == nil {
-
-			filename := session.ID
-			if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint(filename)+".png"); err != nil {
-				c.String(400, fmt.Sprintf("An error occurred when saving map: %s", err.Error()))
-				return
-			}
-			session.Map = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprint(filename)+".png"
-			db.Save(&session)
-		}
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
@@ -96,6 +86,26 @@ func main() {
 		db.Create(&sessionbeacon)
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
+		return
+	})
+
+	router.POST("/map", func(c *gin.Context) {
+		file, err := c.FormFile("Map")
+		if err != nil {
+			c.String(400, fmt.Sprintf("get form err: %s", err.Error()))
+			return
+		}
+
+		files,_ := ioutil.ReadDir("./maps/")
+		filecount := len(files)
+		if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint("%d", filecount)+".png"); err != nil {
+			c.String(400, fmt.Sprintf("upload file err: %s", err.Error()))
+			return
+		}
+		var url URL
+		url.Url = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprintf("%d", filecount)+".png"
+
+		c.IndentedJSON(200, url)
 		return
 	})
 

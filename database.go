@@ -50,6 +50,10 @@ type SessionBeacon struct {
 	YCoordinate float64
 }
 
+type URL struct {
+	Url string
+}
+
 var db *gorm.DB
 
 func init() {
