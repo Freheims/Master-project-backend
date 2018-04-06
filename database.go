@@ -34,8 +34,8 @@ type Datapoint struct {
 type Beacon struct {
 	gorm.Model
 	UUID		string
-	Major		string
-	Minor		string
+	Major		int
+	Minor		int
 	Name		string
 }
 
@@ -43,8 +43,8 @@ type SessionBeacon struct {
 	gorm.Model
 	SessionId	int
 	UUID		string
-	Major		string
-	Minor		string
+	Major		int
+	Minor		int
 	Name		string
 	XCoordinate	float64
 	YCoordinate float64
