@@ -15,18 +15,16 @@ func main() {
 		c.Bind(&session)
 		db.Create(&session)
 		file, err := c.FormFile("Map")
-		if err != nil {
-			c.String(400, fmt.Sprintf("get form err: %s", err.Error()))
-			return
-		}
+		if err == nil {
 
-		filename := session.ID
-		if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint(filename)+".png"); err != nil {
-			c.String(400, fmt.Sprintf("upload file err: %s", err.Error()))
-			return
+			filename := session.ID
+			if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint(filename)+".png"); err != nil {
+				c.String(400, fmt.Sprintf("An error occurred when saving map: %s", err.Error()))
+				return
+			}
+			session.Map = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprint(filename)+".png"
+			db.Save(&session)
 		}
-		session.Map = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprint(filename)+".png"
-		db.Save(&session)
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
