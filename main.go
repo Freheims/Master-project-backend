@@ -122,6 +122,15 @@ func main() {
 		db.AutoMigrate(&SessionBeacon{})
 	})
 
+	router.GET("/debug/drop/sessions", func(c *gin.Context) {
+		db.DropTableIfExists(&Session{})
+		db.DropTableIfExists(&Datapoint{})
+		db.DropTableIfExists(&SessionBeacon{})
+		db.AutoMigrate(&Session{})
+		db.AutoMigrate(&Datapoint{})
+		db.AutoMigrate(&SessionBeacon{})
+	})
+
 	router.Static("/maps", "./maps")
 
 	router.Run(":8000")
