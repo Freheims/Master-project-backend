@@ -2,7 +2,7 @@
 
 ## Endpoints
 
-### POST '/session'
+### OPTIONS '/session'
 Post a new Session
 
 ### GET '/raw/sessions'
@@ -27,5 +27,11 @@ Get all beacons
 ### POST '/sessionbeacon'
 Create a new SessionBeacon
 
+### POST '/map'
+Upload a .png image file
+
 ### GET '/debug/drop'
 Drop all tables
+
+### GET '/debug/drop/sessions'
+Drop Session and SessionBeacon tables
