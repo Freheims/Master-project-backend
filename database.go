@@ -53,6 +53,7 @@ type SessionBeacon struct {
 
 type Location struct {
 	gorm.Model
+	SessionId		int
 	XCoordinate		float64
 	YCoordinate		float64
 	Duration		int
