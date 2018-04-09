@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
@@ -12,6 +13,8 @@ import (
 var router = gin.Default()
 
 func main() {
+
+	router.Use(cors.Default())
 
 	router.OPTIONS("/session", func(c *gin.Context) {
 		var session Session
