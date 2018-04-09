@@ -25,9 +25,9 @@ func main() {
 		var session Session
 		c.Bind(&session)
 		db.Create(&session)
-		c.Header("Access-Control-Allow-Origin", "*")
-		c.Header("Access-Control-Allow-Headers", "*")
-		c.Header("Access-Control-Allow-Methods", "*")
+		//c.Header("Access-Control-Allow-Origin", "*")
+		//c.Header("Access-Control-Allow-Headers", "*")
+		//c.Header("Access-Control-Allow-Methods", "*")
 		c.Status(200)
 		return
 	})
