@@ -14,7 +14,12 @@ var router = gin.Default()
 
 func main() {
 
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:     []string{"PUT", "POST", "GET", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Accept", "Content-Length"},
+		ExposeHeaders:    []string{"Content-Length"},
+	}))
 
 	router.OPTIONS("/session", func(c *gin.Context) {
 		var session Session
