@@ -17,13 +17,10 @@ func main() {
 		var session Session
 		c.Bind(&session)
 		db.Create(&session)
-		locations := ProcessSession(session)
-		session.Locations = locations
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "*")
 		c.Header("Access-Control-Allow-Methods", "*")
-		//c.Status(200)
-		c.IndentedJSON(200, &session)
+		c.Status(200)
 		return
 	})
 
@@ -62,6 +59,8 @@ func main() {
 		db.Find(&session, sessionid)
 		var newSession Session
 		c.Bind(&newSession)
+		locations := ProcessSession(newSession)
+		newSession.Locations = locations
 		db.Model(&session).Updates(&newSession)
 		db.Save(&session)
 		c.Header("Access-Control-Allow-Origin", "*")
@@ -175,10 +174,6 @@ func ProcessSession(session Session) []Location {
 				}
 			prevDatapoint = datapoint
 			} else if datapoint.RSSI > prevDatapoint.RSSI {
-				test := strings.ToLower(datapoint.UUID) == strings.ToLower(prevDatapoint.UUID) && datapoint.Major == prevDatapoint.Major && datapoint.Minor == prevDatapoint.Minor
-				fmt.Println(strings.ToLower(prevDatapoint.UUID)+" "+fmt.Sprint(prevDatapoint.Major)+" "+fmt.Sprint(prevDatapoint.Minor))
-				fmt.Println(strings.ToLower(datapoint.UUID)+" "+fmt.Sprint(datapoint.Major)+" "+fmt.Sprint(datapoint.Minor))
-				fmt.Println(test)
 				locations = append(locations, location)
 				location = Location{}
 				location.XCoordinate, location.YCoordinate = findCoordinates(prevDatapoint, session)
@@ -188,9 +183,6 @@ func ProcessSession(session Session) []Location {
 		}
 	}
 	locations = append(locations, location)
-	for _,loc := range locations {
-		fmt.Println(loc)
-	}
 	return locations
 }
 
