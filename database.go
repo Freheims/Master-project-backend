@@ -13,6 +13,7 @@ type Session struct {
 	EndTime		int
 	Datapoints	[]Datapoint `gorm:"foreignkey:SessionId"`
 	Beacons		[]SessionBeacon `gorm:"foreignkey:SessionId"`
+	Locations	[]Location `gorm:"foreignkey:SessionId"`
 	Finished	bool `gorm:"default:false"`
 	Map			string
 }
@@ -50,6 +51,15 @@ type SessionBeacon struct {
 	YCoordinate float64
 }
 
+type Location struct {
+	gorm.Model
+	XCoordinate		float64
+	YCoordinate		float64
+	Duration		int
+	Walking			bool
+	HeadMovement	bool
+}
+
 type URL struct {
 	Url string
 }
@@ -68,4 +78,5 @@ func init() {
 	db.AutoMigrate(&Datapoint{})
 	db.AutoMigrate(&Beacon{})
 	db.AutoMigrate(&SessionBeacon{})
+	db.AutoMigrate(&Location{})
 }
