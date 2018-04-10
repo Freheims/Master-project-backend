@@ -27,8 +27,10 @@ func main() {
 
 	router.OPTIONS("/session", func(c *gin.Context) {
 		var session Session
-		err := c.Bind(&session)
-		fmt.Println(err)
+		c.Bind(&session)
+		if session.Name =="" || session.User == "" || len(session.Beacons) <1 {
+			return
+		}
 		db.Create(&session)
 		return
 	})
