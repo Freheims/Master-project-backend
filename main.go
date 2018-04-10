@@ -5,37 +5,37 @@ import (
 	"fmt"
 	"math"
 	"strings"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 var router = gin.Default()
+func CORSMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+
+        c.Writer.Header().Set("Content-Type", "application/json")
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+        c.Next()
+    }
+}
 
 func main() {
 
-	router.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		AllowMethods:     []string{"PUT", "POST", "GET", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type", "Accept", "Content-Length"},
-		ExposeHeaders:    []string{"Content-Length"},
-	}))
+	router.Use(CORSMiddleware())
 
 	router.OPTIONS("/session", func(c *gin.Context) {
 		var session Session
-		c.Bind(&session)
+		err := c.Bind(&session)
+		fmt.Println(err)
 		db.Create(&session)
-		//c.Header("Access-Control-Allow-Origin", "*")
-		//c.Header("Access-Control-Allow-Headers", "*")
-		//c.Header("Access-Control-Allow-Methods", "*")
-		c.Status(200)
 		return
 	})
 
 	router.GET("/raw/sessions", func(c *gin.Context) {
 		var sessions []Session
 		db.Preload("Datapoints").Preload("Beacons").Find(&sessions)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &sessions)
 		return
 
@@ -45,7 +45,6 @@ func main() {
 		var session Session
 		sessionid := c.Param("id")
 		db.Preload("Datapoints").Preload("Beacons").Find(&session, sessionid)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &session)
 		return
 
@@ -55,7 +54,6 @@ func main() {
 		finished := c.PostForm("Finished")
 		var sessions []Session
 		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Where("finished = ?", finished).Find(&sessions)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &sessions)
 		return
 
@@ -71,7 +69,6 @@ func main() {
 		newSession.Locations = locations
 		db.Model(&session).Updates(&newSession)
 		db.Save(&session)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
 
@@ -81,7 +78,6 @@ func main() {
 		var session Session
 		sessionid := c.Param("id")
 		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Find(&session, sessionid)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &session)
 		return
 
@@ -91,7 +87,6 @@ func main() {
 		var beacon Beacon
 		c.Bind(&beacon)
 		db.Create(&beacon)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
 	})
@@ -99,7 +94,6 @@ func main() {
 	router.GET("/beacons", func(c *gin.Context) {
 		var beacons []Beacon
 		db.Find(&beacons)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.IndentedJSON(200, &beacons)
 		return
 	})
@@ -108,7 +102,6 @@ func main() {
 		var sessionbeacon SessionBeacon
 		c.Bind(&sessionbeacon)
 		db.Create(&sessionbeacon)
-		c.Header("Access-Control-Allow-Origin", "*")
 		c.Status(200)
 		return
 	})

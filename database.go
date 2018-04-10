@@ -22,8 +22,8 @@ type Datapoint struct {
 	gorm.Model
 	SessionId	int
 	UUID		string
-	Major		int
-	Minor		int
+	Major		string
+	Minor		string
 	Timestamp	int
 	RSSI		int
 	Steps		int
@@ -35,8 +35,8 @@ type Datapoint struct {
 type Beacon struct {
 	gorm.Model
 	UUID		string
-	Major		int
-	Minor		int
+	Major		string
+	Minor		string
 	Name		string
 }
 
@@ -44,8 +44,8 @@ type SessionBeacon struct {
 	gorm.Model
 	SessionId	int
 	UUID		string
-	Major		int
-	Minor		int
+	Major		string
+	Minor		string
 	Name		string
 	XCoordinate	float64
 	YCoordinate float64
