@@ -37,7 +37,7 @@ func main() {
 
 	router.GET("/raw/sessions", func(c *gin.Context) {
 		var sessions []Session
-		db.Preload("Datapoints").Preload("Beacons").Find(&sessions)
+		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Find(&sessions)
 		c.IndentedJSON(200, &sessions)
 		return
 
@@ -46,7 +46,7 @@ func main() {
 	router.GET("/raw/session/:id", func(c *gin.Context) {
 		var session Session
 		sessionid := c.Param("id")
-		db.Preload("Datapoints").Preload("Beacons").Find(&session, sessionid)
+		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Find(&session, sessionid)
 		c.IndentedJSON(200, &session)
 		return
 
@@ -71,7 +71,6 @@ func main() {
 		newSession.Locations = locations
 		db.Model(&session).Updates(&newSession)
 		db.Save(&session)
-		c.Status(200)
 		return
 
 	})
