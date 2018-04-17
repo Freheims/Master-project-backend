@@ -2,6 +2,8 @@ package main
 
 import (
 	"io/ioutil"
+	"io"
+	"os"
 	"fmt"
 	"math"
 	"strings"
@@ -9,19 +11,23 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-var router = gin.Default()
 func CORSMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
 
-        c.Writer.Header().Set("Content-Type", "application/json")
+        c.Writer.Header().Set("Content-Type", "application/json, multipart/form-data")
         c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS, POST")
         c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
         c.Next()
     }
 }
 
 func main() {
+	gin.DisableConsoleColor()
+	f, _ := os.Create("gin.log")
+    gin.DefaultWriter = io.MultiWriter(f)
+
+	var router = gin.Default()
 
 	router.Use(CORSMiddleware())
 
