@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"io/ioutil"
 	"io"
 	"os"
@@ -23,9 +24,9 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func main() {
-	gin.DisableConsoleColor()
 	f, _ := os.Create("gin.log")
-    gin.DefaultWriter = io.MultiWriter(f)
+    gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+	log.SetOutput(f)
 
 	var router = gin.Default()
 
@@ -165,6 +166,8 @@ func main() {
 func ProcessSession(session Session) []Location {
 	var locations []Location
 	datapoints := session.Datapoints
+	numDatapoints := len(datapoints)
+	log.Println("Number of datapoints: " + fmt.Sprint(numDatapoints))
 	prevDatapoint := datapoints[0]
 	var location Location
 	location.XCoordinate, location.YCoordinate = findCoordinates(prevDatapoint, session)
@@ -189,6 +192,8 @@ func ProcessSession(session Session) []Location {
 				prevDatapoint = datapoint
 			}
 		}
+		log.Println("Datapoint completed, " + fmt.Sprint(numDatapoints) + " left")
+		numDatapoints -= 1
 	}
 	locations = append(locations, location)
 	return locations
