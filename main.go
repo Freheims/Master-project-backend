@@ -187,6 +187,11 @@ func ProcessSession(session Session) []Location {
 			} else if datapoint.RSSI > prevDatapoint.RSSI {
 				locations = append(locations, location)
 				location = Location{}
+				prevX, prevY := findCoordinates(prevDatapoint, session)
+				newX, newY := findCoordinates(datapoint, session)
+				location.XCoordinate, location.YCoordinate = findMidpoint(prevX, prevY, newX, newY)
+				locations = append(locations, location)
+				location = Location{}
 				location.XCoordinate, location.YCoordinate = findCoordinates(prevDatapoint, session)
 				location.Duration = 0
 				prevDatapoint = datapoint
@@ -216,4 +221,10 @@ func isDatapointValid(datapoint Datapoint, session Session) bool {
 		}
 	}
 	return false
+}
+
+func findMidpoint(x1 float64, y1 float64, x2 float64, y2 float64) (float64, float64) {
+	x := (x1 + x2)/2
+	y := (y1 + y2)/2
+	return x, y
 }
