@@ -1,6 +1,7 @@
 package main
 
 import (
+	"mime"
 	"log"
 	"io/ioutil"
 	"io"
@@ -123,12 +124,15 @@ func main() {
 
 		files,_ := ioutil.ReadDir("./maps/")
 		filecount := len(files)
-		if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint(filecount)+".png"); err != nil {
+		fileExtensions, err := mime.ExtensionsByType(file.Header.Get("Content-Type"))
+		fileExtension := fileExtensions[0]
+
+		if err := c.SaveUploadedFile(file, "./maps/"+fmt.Sprint(filecount) + fileExtension); err != nil {
 			c.String(400, fmt.Sprintf("upload file err: %s", err.Error()))
 			return
 		}
 		var url URL
-		url.Url = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprint(filecount)+".png"
+		url.Url = "firetracker.freheims.xyz:8000/maps/"+fmt.Sprint(filecount) + fileExtension
 
 		c.IndentedJSON(200, url)
 		return
