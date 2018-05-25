@@ -201,7 +201,6 @@ func ProcessSession(session Session) []Location {
 				prevDatapoint = datapoint
 			}
 		}
-		log.Println("Datapoint completed, " + fmt.Sprint(numDatapoints) + " left")
 		numDatapoints -= 1
 	}
 	locations = append(locations, location)
