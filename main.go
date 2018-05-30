@@ -43,15 +43,24 @@ func main() {
 		return
 	})
 
-	router.GET("/raw/sessions", func(c *gin.Context) {
+	router.GET("/sessions", func(c *gin.Context) {
 		var sessions []Session
-		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Find(&sessions)
+		db.Preload("Beacons").Find(&sessions)
 		c.IndentedJSON(200, &sessions)
 		return
 
 	})
 
-	router.GET("/raw/session/:id", func(c *gin.Context) {
+	router.GET("/session/:id", func(c *gin.Context) {
+		var session Session
+		sessionid := c.Param("id")
+		db.Preload("Beacons").Preload("Locations").Find(&session, sessionid)
+		c.IndentedJSON(200, &session)
+		return
+
+	})
+
+	router.GET("/fullsession/:id", func(c *gin.Context) {
 		var session Session
 		sessionid := c.Param("id")
 		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Find(&session, sessionid)
@@ -60,7 +69,7 @@ func main() {
 
 	})
 
-	router.POST("/raw/sessions", func(c *gin.Context) {
+	router.POST("/sessions", func(c *gin.Context) {
 		finished := c.PostForm("Finished")
 		var sessions []Session
 		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Where("finished = ?", finished).Find(&sessions)
@@ -69,7 +78,7 @@ func main() {
 
 	})
 
-	router.PUT("/raw/session/:id", func(c *gin.Context) {
+	router.PUT("/session/:id", func(c *gin.Context) {
 		var session Session
 		sessionid := c.Param("id")
 		db.Find(&session, sessionid)
@@ -79,15 +88,6 @@ func main() {
 		newSession.Locations = locations
 		db.Model(&session).Updates(&newSession)
 		db.Save(&session)
-		return
-
-	})
-
-	router.GET("/session/:id", func(c *gin.Context) {
-		var session Session
-		sessionid := c.Param("id")
-		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Find(&session, sessionid)
-		c.IndentedJSON(200, &session)
 		return
 
 	})
