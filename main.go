@@ -51,6 +51,15 @@ func main() {
 
 	})
 
+	router.POST("/sessions", func(c *gin.Context) {
+		finished := c.PostForm("Finished")
+		var sessions []Session
+		db.Preload("Beacons").Where("finished = ?", finished).Find(&sessions)
+		c.IndentedJSON(200, &sessions)
+		return
+
+	})
+
 	router.GET("/session/:id", func(c *gin.Context) {
 		var session Session
 		sessionid := c.Param("id")
@@ -65,15 +74,6 @@ func main() {
 		sessionid := c.Param("id")
 		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Find(&session, sessionid)
 		c.IndentedJSON(200, &session)
-		return
-
-	})
-
-	router.POST("/sessions", func(c *gin.Context) {
-		finished := c.PostForm("Finished")
-		var sessions []Session
-		db.Preload("Datapoints").Preload("Beacons").Preload("Locations").Where("finished = ?", finished).Find(&sessions)
-		c.IndentedJSON(200, &sessions)
 		return
 
 	})
