@@ -190,11 +190,11 @@ func ProcessSession(session Session) []Location {
 			prevDatapoint = datapoint
 			} else if datapoint.RSSI > prevDatapoint.RSSI {
 				locations = append(locations, location)
-				location = Location{}
-				prevX, prevY := findCoordinates(prevDatapoint, session)
-				newX, newY := findCoordinates(datapoint, session)
-				location.XCoordinate, location.YCoordinate = findMidpoint(prevX, prevY, newX, newY)
-				locations = append(locations, location)
+				//location = Location{}
+				//prevX, prevY := findCoordinates(prevDatapoint, session)
+				//newX, newY := findCoordinates(datapoint, session)
+				//location.XCoordinate, location.YCoordinate = findMidpoint(prevX, prevY, newX, newY)
+				//locations = append(locations, location)
 				location = Location{}
 				location.XCoordinate, location.YCoordinate = findCoordinates(prevDatapoint, session)
 				location.Duration = 0
@@ -204,7 +204,12 @@ func ProcessSession(session Session) []Location {
 		numDatapoints -= 1
 	}
 	locations = append(locations, location)
-	return locations
+	cleanedLocations := CleanLocations(locations)
+	if len(cleanedLocations) != len(locations) {
+		locations = cleanedLocations
+		cleanedLocations = CleanLocations(locations)
+	}
+	return cleanedLocations
 }
 
 
@@ -230,4 +235,25 @@ func findMidpoint(x1 float64, y1 float64, x2 float64, y2 float64) (float64, floa
 	x := (x1 + x2)/2
 	y := (y1 + y2)/2
 	return x, y
+}
+
+func CleanLocations(locations []Location) []Location {
+	var cleanLocations []Location
+	//TODO Fix walking and head movement
+	for i := 1; i < len(locations)-2; i++ {
+		currentLocation := locations[i]
+		nextLocation := locations[i+1]
+		nextNextLocation := locations[i+2]
+		if currentLocation.XCoordinate == nextLocation.XCoordinate && currentLocation.YCoordinate == nextLocation.YCoordinate {
+			currentLocation.Duration += nextLocation.Duration
+			cleanLocations = append(cleanLocations, currentLocation)
+			i++
+		} else if currentLocation.XCoordinate == nextNextLocation.XCoordinate && currentLocation.YCoordinate == nextNextLocation.YCoordinate  && nextLocation.Duration > 500 {
+			currentLocation.Duration += nextNextLocation.Duration
+			cleanLocations = append(cleanLocations, currentLocation)
+			i += 2
+		}
+	}
+	return cleanLocations
+
 }
