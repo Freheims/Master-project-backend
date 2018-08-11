@@ -204,12 +204,19 @@ func ProcessSession(session Session) []Location {
 		numDatapoints -= 1
 	}
 	locations = append(locations, location)
-	cleanedLocations := CleanLocations(locations)
-	if len(cleanedLocations) != len(locations) {
-		locations = cleanedLocations
-		cleanedLocations = CleanLocations(locations)
-	}
+	cleanedLocations := CleanLocations2(locations)
 	return cleanedLocations
+	//fmt.Println(len(cleanedLocations))
+	//for {
+	//	if len(cleanedLocations) != len(locations) {
+	//		locations = cleanedLocations
+	//		cleanedLocations = CleanLocations(locations)
+	//		fmt.Println(len(cleanedLocations))
+	//	} else {
+	//		return cleanedLocations
+	//	}
+	//}
+	//return locations
 }
 
 
@@ -237,23 +244,68 @@ func findMidpoint(x1 float64, y1 float64, x2 float64, y2 float64) (float64, floa
 	return x, y
 }
 
-func CleanLocations(locations []Location) []Location {
-	var cleanLocations []Location
-	//TODO Fix walking and head movement
-	for i := 1; i < len(locations)-2; i++ {
-		currentLocation := locations[i]
-		nextLocation := locations[i+1]
-		nextNextLocation := locations[i+2]
-		if currentLocation.XCoordinate == nextLocation.XCoordinate && currentLocation.YCoordinate == nextLocation.YCoordinate {
-			currentLocation.Duration += nextLocation.Duration
-			cleanLocations = append(cleanLocations, currentLocation)
-			i++
-		} else if currentLocation.XCoordinate == nextNextLocation.XCoordinate && currentLocation.YCoordinate == nextNextLocation.YCoordinate  && nextLocation.Duration > 500 {
-			currentLocation.Duration += nextNextLocation.Duration
-			cleanLocations = append(cleanLocations, currentLocation)
-			i += 2
+func CleanLocations2(locations []Location) []Location {
+	var legitLocations []Location
+	for _, location := range locations {
+		if location.Duration > 10000 {
+			legitLocations = append(legitLocations, location)
 		}
 	}
+	var cleanLocations []Location
+	for i := 0; i < len(legitLocations)-1; i++ {
+		currentLocation := legitLocations[i]
+		nextLocation := legitLocations[i+1]
+		if currentLocation.XCoordinate == nextLocation.XCoordinate && currentLocation.YCoordinate == nextLocation.YCoordinate {
+			fmt.Println(currentLocation)
+			fmt.Println(nextLocation)
+			fmt.Println("")
+			newLocation := MergeLocations(currentLocation, nextLocation)
+			cleanLocations = append(cleanLocations, newLocation)
+			i++
+		} else {
+			cleanLocations = append(cleanLocations, currentLocation)
+		}
+	}
+	if legitLocations[len(legitLocations)-1].XCoordinate != legitLocations[len(legitLocations)-2].XCoordinate && legitLocations[len(legitLocations)-1].YCoordinate != legitLocations[len(legitLocations)-2].YCoordinate {
+		cleanLocations = append(cleanLocations, legitLocations[len(legitLocations)-1])
+	}
 	return cleanLocations
+}
 
+
+//func CleanLocations(locations []Location) []Location {
+//	var cleanLocations []Location
+//	//TODO Fix walking and head movement
+//	for i := 0; i < len(locations)-2; i++ {
+//		currentLocation := locations[i]
+//		nextLocation := locations[i+1]
+//		nextNextLocation := locations[i+2]
+//		if currentLocation.XCoordinate == nextLocation.XCoordinate && currentLocation.YCoordinate == nextLocation.YCoordinate {
+//			currentLocation.Duration += nextLocation.Duration
+//			cleanLocations = append(cleanLocations, currentLocation)
+//			i++
+//		} else if currentLocation.XCoordinate == nextNextLocation.XCoordinate && currentLocation.YCoordinate == nextNextLocation.YCoordinate  && nextLocation.Duration < 1 {
+//			currentLocation.Duration += nextNextLocation.Duration
+//			cleanLocations = append(cleanLocations, currentLocation)
+//			i += 2
+//		} else {
+//			cleanLocations = append(cleanLocations, currentLocation)
+//		}
+//	}
+//	return cleanLocations
+//
+//}
+
+func MergeLocations(firstLocation Location, secondLocation Location) Location{
+	var newLocation Location
+	newLocation.XCoordinate = firstLocation.XCoordinate
+	newLocation.YCoordinate = firstLocation.YCoordinate
+	newLocation.Duration = firstLocation.Duration + secondLocation.Duration
+	if firstLocation.Walking || secondLocation.Walking {
+		newLocation.Walking = true
+	}
+	if firstLocation.HeadMovement || secondLocation.HeadMovement {
+		newLocation.HeadMovement = true
+	}
+	return newLocation
 }

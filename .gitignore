@@ -106,3 +106,4 @@ Master-project-backend
 *.swp
 
 maps/
+data/
