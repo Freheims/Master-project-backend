@@ -92,12 +92,24 @@ func main() {
 
 	})
 
-	router.POST("/beacon", func(c *gin.Context) {
+	router.OPTIONS("/beacon", func(c *gin.Context) {
 		var beacon Beacon
 		c.Bind(&beacon)
 		db.Create(&beacon)
 		c.Status(200)
 		return
+	})
+
+
+	router.DELETE("/beacon/:id", func(c *gin.Context) {
+		var beacon Beacon
+		id := c.Param("id")
+		if db.First(&beacon, id).RecordNotFound() {
+			c.IndentedJSON(500, gin.H{"message": "Didn't find any beacons", "status": "failure"})
+			return
+		}
+		db.Delete(&beacon)
+		c.IndentedJSON(200, gin.H{"message": "Deleted", "status": "succsess"})
 	})
 
 	router.GET("/beacons", func(c *gin.Context) {
