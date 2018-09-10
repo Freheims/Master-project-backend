@@ -95,6 +95,9 @@ func main() {
 	router.OPTIONS("/beacon", func(c *gin.Context) {
 		var beacon Beacon
 		c.Bind(&beacon)
+		if beacon.UUID == "" || beacon.Major == "" || beacon.Minor == "" {
+			return
+		}
 		db.Create(&beacon)
 		c.Status(200)
 		return
