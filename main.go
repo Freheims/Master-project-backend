@@ -104,9 +104,9 @@ func main() {
 	})
 
 
-	router.DELETE("/beacon/:id", func(c *gin.Context) {
+	router.OPTIONS("/beacon/delete", func(c *gin.Context) {
 		var beacon Beacon
-		id := c.Param("id")
+		id := c.PostForm("Id")
 		if db.First(&beacon, id).RecordNotFound() {
 			c.IndentedJSON(500, gin.H{"message": "Didn't find any beacons", "status": "failure"})
 			return
