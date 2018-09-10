@@ -153,29 +153,29 @@ func main() {
 		return
 	})
 
-	router.GET("/debug/drop", func(c *gin.Context) {
-		db.DropTableIfExists(&Session{})
-		db.DropTableIfExists(&Datapoint{})
-		db.DropTableIfExists(&Beacon{})
-		db.DropTableIfExists(&SessionBeacon{})
-		db.DropTableIfExists(&Location{})
-		db.AutoMigrate(&Session{})
-		db.AutoMigrate(&Datapoint{})
-		db.AutoMigrate(&Beacon{})
-		db.AutoMigrate(&SessionBeacon{})
-		db.AutoMigrate(&Location{})
-	})
+	//router.GET("/debug/drop", func(c *gin.Context) {
+	//	db.DropTableIfExists(&Session{})
+	//	db.DropTableIfExists(&Datapoint{})
+	//	db.DropTableIfExists(&Beacon{})
+	//	db.DropTableIfExists(&SessionBeacon{})
+	//	db.DropTableIfExists(&Location{})
+	//	db.AutoMigrate(&Session{})
+	//	db.AutoMigrate(&Datapoint{})
+	//	db.AutoMigrate(&Beacon{})
+	//	db.AutoMigrate(&SessionBeacon{})
+	//	db.AutoMigrate(&Location{})
+	//})
 
-	router.GET("/debug/drop/sessions", func(c *gin.Context) {
-		db.DropTableIfExists(&Session{})
-		db.DropTableIfExists(&Datapoint{})
-		db.DropTableIfExists(&SessionBeacon{})
-		db.DropTableIfExists(&Location{})
-		db.AutoMigrate(&Session{})
-		db.AutoMigrate(&Datapoint{})
-		db.AutoMigrate(&SessionBeacon{})
-		db.AutoMigrate(&Location{})
-	})
+	//router.GET("/debug/drop/sessions", func(c *gin.Context) {
+	//	db.DropTableIfExists(&Session{})
+	//	db.DropTableIfExists(&Datapoint{})
+	//	db.DropTableIfExists(&SessionBeacon{})
+	//	db.DropTableIfExists(&Location{})
+	//	db.AutoMigrate(&Session{})
+	//	db.AutoMigrate(&Datapoint{})
+	//	db.AutoMigrate(&SessionBeacon{})
+	//	db.AutoMigrate(&Location{})
+	//})
 
 	router.Static("/maps", "./maps")
 
