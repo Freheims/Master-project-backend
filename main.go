@@ -104,7 +104,7 @@ func main() {
 	})
 
 
-	router.OPTIONS("/beacon/delete", func(c *gin.Context) {
+	router.POST("/beacon/delete", func(c *gin.Context) {
 		var beacon Beacon
 		id := c.PostForm("Id")
 		if id == "" {
