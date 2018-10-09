@@ -192,7 +192,7 @@ func ProcessSession(session Session) []Location {
 	datapoints := session.Datapoints
 	numDatapoints := len(datapoints)
 	log.Println("Number of datapoints: " + fmt.Sprint(numDatapoints))
-	if numDatapoints > 1 {
+	if numDatapoints < 1 {
 		return nil
 	}
 	prevDatapoint := datapoints[0]
