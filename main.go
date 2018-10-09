@@ -192,15 +192,21 @@ func ProcessSession(session Session) []Location {
 	datapoints := session.Datapoints
 	numDatapoints := len(datapoints)
 	log.Println("Number of datapoints: " + fmt.Sprint(numDatapoints))
+	if numDatapoints > 1 {
+		return nil
+	}
 	prevDatapoint := datapoints[0]
 	var location Location
 	location.XCoordinate, location.YCoordinate = findCoordinates(prevDatapoint, session)
 	location.Duration = 0
+	location.StartTime = prevDatapoint.Timestamp
+	location.EndTime = prevDatapoint.Timestamp
 	for i := 1; i < len(datapoints); i++ {
 		datapoint := datapoints[i]
 		if isDatapointValid(datapoint, session) {
 			if strings.ToLower(datapoint.UUID) == strings.ToLower(prevDatapoint.UUID) && datapoint.Major == prevDatapoint.Major && datapoint.Minor == prevDatapoint.Minor {
 				location.Duration += (datapoint.Timestamp - prevDatapoint.Timestamp)
+				location.EndTime = datapoint.Timestamp
 				if (datapoint.Steps - prevDatapoint.Steps) > 5 {
 					location.Walking = true
 				}
@@ -218,6 +224,7 @@ func ProcessSession(session Session) []Location {
 				location = Location{}
 				location.XCoordinate, location.YCoordinate = findCoordinates(prevDatapoint, session)
 				location.Duration = 0
+				location.StartTime =  datapoint.Timestamp
 				prevDatapoint = datapoint
 			}
 		}
@@ -321,6 +328,8 @@ func MergeLocations(firstLocation Location, secondLocation Location) Location{
 	newLocation.XCoordinate = firstLocation.XCoordinate
 	newLocation.YCoordinate = firstLocation.YCoordinate
 	newLocation.Duration = firstLocation.Duration + secondLocation.Duration
+	newLocation.StartTime = firstLocation.StartTime
+	newLocation.EndTime = secondLocation.EndTime
 	if firstLocation.Walking || secondLocation.Walking {
 		newLocation.Walking = true
 	}
