@@ -193,7 +193,7 @@ func ProcessSession(session Session) []Location {
 	numDatapoints := len(datapoints)
 	log.Println("Number of datapoints: " + fmt.Sprint(numDatapoints))
 	if numDatapoints < 1 {
-		return nil
+		return locations
 	}
 	prevDatapoint := datapoints[0]
 	var location Location
@@ -293,8 +293,10 @@ func CleanLocations2(locations []Location) []Location {
 			cleanLocations = append(cleanLocations, currentLocation)
 		}
 	}
-	if legitLocations[len(legitLocations)-1].XCoordinate != legitLocations[len(legitLocations)-2].XCoordinate && legitLocations[len(legitLocations)-1].YCoordinate != legitLocations[len(legitLocations)-2].YCoordinate {
-		cleanLocations = append(cleanLocations, legitLocations[len(legitLocations)-1])
+	if len(legitLocations) > 0 {
+		if legitLocations[len(legitLocations)-1].XCoordinate != legitLocations[len(legitLocations)-2].XCoordinate && legitLocations[len(legitLocations)-1].YCoordinate != legitLocations[len(legitLocations)-2].YCoordinate {
+			cleanLocations = append(cleanLocations, legitLocations[len(legitLocations)-1])
+		}
 	}
 	return cleanLocations
 }
