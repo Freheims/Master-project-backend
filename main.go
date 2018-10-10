@@ -293,7 +293,7 @@ func CleanLocations2(locations []Location) []Location {
 			cleanLocations = append(cleanLocations, currentLocation)
 		}
 	}
-	if len(legitLocations) > 0 {
+	if len(legitLocations) > 1 {
 		if legitLocations[len(legitLocations)-1].XCoordinate != legitLocations[len(legitLocations)-2].XCoordinate && legitLocations[len(legitLocations)-1].YCoordinate != legitLocations[len(legitLocations)-2].YCoordinate {
 			cleanLocations = append(cleanLocations, legitLocations[len(legitLocations)-1])
 		}
