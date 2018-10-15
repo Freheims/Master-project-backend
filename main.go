@@ -192,17 +192,27 @@ func ProcessSession(session Session) []Location {
 	datapoints := session.Datapoints
 	numDatapoints := len(datapoints)
 	log.Println("Number of datapoints: " + fmt.Sprint(numDatapoints))
+	var relevantDatapoints []Datapoint
+	for _, datapoint := range datapoints {
+		for _, beacon := range session.Beacons {
+			if strings.ToLower(beacon.UUID) == strings.ToLower(datapoint.UUID) && beacon.Major == datapoint.Major && beacon.Minor == datapoint.Minor {
+				relevantDatapoints = append(relevantDatapoints, datapoint)
+			}
+		}
+	}
+	numDatapoints = len(relevantDatapoints)
+	log.Println("Number of datapoints: " + fmt.Sprint(numDatapoints))
 	if numDatapoints < 1 {
 		return locations
 	}
-	prevDatapoint := datapoints[0]
+	prevDatapoint := relevantDatapoints[0]
 	var location Location
 	location.XCoordinate, location.YCoordinate = findCoordinates(prevDatapoint, session)
 	location.Duration = 0
 	location.StartTime = prevDatapoint.Timestamp
 	location.EndTime = prevDatapoint.Timestamp
-	for i := 1; i < len(datapoints); i++ {
-		datapoint := datapoints[i]
+	for i := 1; i < len(relevantDatapoints); i++ {
+		datapoint := relevantDatapoints[i]
 		if isDatapointValid(datapoint, session) {
 			if strings.ToLower(datapoint.UUID) == strings.ToLower(prevDatapoint.UUID) && datapoint.Major == prevDatapoint.Major && datapoint.Minor == prevDatapoint.Minor {
 				location.Duration += (datapoint.Timestamp - prevDatapoint.Timestamp)
