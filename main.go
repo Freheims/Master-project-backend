@@ -211,8 +211,14 @@ func ProcessSession(session Session) []Location {
 	location.Duration = 0
 	location.StartTime = prevDatapoint.Timestamp
 	location.EndTime = prevDatapoint.Timestamp
+	log.Println()
+	log.Println(prevDatapoint.Minor)
+	log.Println()
 	for i := 1; i < len(relevantDatapoints); i++ {
 		datapoint := relevantDatapoints[i]
+		//log.Println()
+		//log.Println(datapoint.Minor)
+		//log.Println()
 		if isDatapointValid(datapoint, session) {
 			if strings.ToLower(datapoint.UUID) == strings.ToLower(prevDatapoint.UUID) && datapoint.Major == prevDatapoint.Major && datapoint.Minor == prevDatapoint.Minor {
 				location.Duration += (datapoint.Timestamp - prevDatapoint.Timestamp)
@@ -224,7 +230,7 @@ func ProcessSession(session Session) []Location {
 					location.HeadMovement = true
 				}
 			prevDatapoint = datapoint
-			} else if datapoint.RSSI > prevDatapoint.RSSI {
+			} else if datapoint.RSSI > prevDatapoint.RSSI || datapoint.Timestamp - prevDatapoint.Timestamp > 20000{
 				locations = append(locations, location)
 				//location = Location{}
 				//prevX, prevY := findCoordinates(prevDatapoint, session)
@@ -241,8 +247,49 @@ func ProcessSession(session Session) []Location {
 		numDatapoints -= 1
 	}
 	locations = append(locations, location)
-	cleanedLocations := CleanLocations2(locations)
-	return cleanedLocations
+	log.Println("Number of locations before cleaning")
+	log.Println(len(locations))
+	for _, location := range locations {
+		log.Println(location.XCoordinate)
+		log.Println(location.YCoordinate)
+		log.Println(location.Duration)
+		log.Println()
+	}
+	legitLocations := getLegitLocations(locations)
+
+
+	lengthBeforeCleaningAndMerging := len(legitLocations)
+	lengthAfterCleaningAndMerging := 100000000000
+	for lengthBeforeCleaningAndMerging != lengthAfterCleaningAndMerging {
+		lengthBeforeCleaningAndMerging = len(legitLocations)
+		legitLocations = mergeLocationsList(legitLocations)
+		log.Println("Number of locations after merging")
+		log.Println(len(legitLocations))
+		legitLocations = cleanLocations3(legitLocations)
+		log.Println("Number of locations after cleaning")
+		log.Println(len(legitLocations))
+		legitLocations = mergeLocationsList(legitLocations)
+		log.Println("Number of locations after merging 2")
+		log.Println(len(legitLocations))
+		lengthAfterCleaningAndMerging = len(legitLocations)
+
+	}
+
+
+
+
+
+	//mergedLocations := mergeLocationsList(legitLocations)
+	//log.Println("Number of locations after merging")
+	//log.Println(len(mergedLocations))
+	//cleanedLocations := cleanLocations3(mergedLocations)
+	//log.Println("Number of locations after cleaning")
+	//log.Println(len(cleanedLocations))
+	//doneLocations := mergeLocationsList(cleanedLocations)
+	//log.Println("Number of locations after merging 2")
+	//log.Println(len(doneLocations))
+
+	return legitLocations
 	//fmt.Println(len(cleanedLocations))
 	//for {
 	//	if len(cleanedLocations) != len(locations) {
@@ -281,21 +328,58 @@ func findMidpoint(x1 float64, y1 float64, x2 float64, y2 float64) (float64, floa
 	return x, y
 }
 
-func CleanLocations2(locations []Location) []Location {
+func countOccurences(loc Location, locations []Location) int{
+	count := 0
+	for _, location := range locations {
+		if loc.XCoordinate == location.XCoordinate && loc.YCoordinate == location.YCoordinate {
+			count += 1
+		}
+	}
+	return count
+}
+
+func isFirstLocationInList(loc Location, locations []Location) bool {
+	count := 0
+	for _, location := range locations {
+		if loc.XCoordinate == location.XCoordinate && loc.YCoordinate == location.YCoordinate {
+			count += 1
+			if loc.ID == location.ID && count == 1 {
+				return true
+			} else {
+				return false
+			}
+		}
+	}
+	return false
+}
+
+func getLegitLocations(locations []Location) []Location {
 	var legitLocations []Location
 	for _, location := range locations {
-		if location.Duration > 10000 {
+		if location.Duration > 0 {
 			legitLocations = append(legitLocations, location)
+		} else if countOccurences(location, locations) == 1{
+			if isFirstLocationInList(location, locations) {
+				legitLocations = append(legitLocations, location)
+			}
 		}
+	}
+	return legitLocations
+}
+
+func mergeLocationsList(legitLocations []Location) []Location {
+	if len(legitLocations)<2{
+		return legitLocations
 	}
 	var cleanLocations []Location
 	for i := 0; i < len(legitLocations)-1; i++ {
 		currentLocation := legitLocations[i]
 		nextLocation := legitLocations[i+1]
 		if currentLocation.XCoordinate == nextLocation.XCoordinate && currentLocation.YCoordinate == nextLocation.YCoordinate {
-			fmt.Println(currentLocation)
-			fmt.Println(nextLocation)
-			fmt.Println("")
+			log.Println("Found two similar locations")
+			log.Println(currentLocation)
+			log.Println(nextLocation)
+			log.Println()
 			newLocation := MergeLocations(currentLocation, nextLocation)
 			cleanLocations = append(cleanLocations, newLocation)
 			i++
@@ -306,9 +390,33 @@ func CleanLocations2(locations []Location) []Location {
 	if len(legitLocations) > 1 {
 		if legitLocations[len(legitLocations)-1].XCoordinate != legitLocations[len(legitLocations)-2].XCoordinate && legitLocations[len(legitLocations)-1].YCoordinate != legitLocations[len(legitLocations)-2].YCoordinate {
 			cleanLocations = append(cleanLocations, legitLocations[len(legitLocations)-1])
+			log.Println("Added last location")
 		}
 	}
 	return cleanLocations
+}
+
+func cleanLocations3(locations []Location) []Location {
+	if len(locations)<2 {
+		return locations
+	}
+
+	var cleanLocations []Location
+	for i := 0; i < len(locations)-2; i++ {
+		currentLocation := locations[i]
+		nextNextLocation := locations[i+2]
+		if currentLocation.XCoordinate == nextNextLocation.XCoordinate && currentLocation.YCoordinate == nextNextLocation.YCoordinate {
+			if currentLocation.Duration > nextNextLocation.Duration {
+				cleanLocations = append(cleanLocations, currentLocation)
+			}
+		} else {
+			cleanLocations = append(cleanLocations, currentLocation)
+		}
+	}
+	cleanLocations = append(cleanLocations, locations[len(locations)-2])
+	cleanLocations = append(cleanLocations, locations[len(locations)-1])
+	return cleanLocations
+
 }
 
 
